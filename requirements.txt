@@ -32,7 +32,7 @@ exceptiongroup @ file:///croot/exceptiongroup_1706031385326/work
 executing @ file:///home/conda/feedstock_root/build_artifacts/executing_1698579936712/work
 fastjsonschema==2.19.1
 filelock==3.13.1
-fonttools==4.50.0
+fonttools==4.56.0
 frozenlist==1.4.1
 fsspec==2024.2.0
 gitdb @ file:///home/conda/feedstock_root/build_artifacts/gitdb_1697791558612/work
