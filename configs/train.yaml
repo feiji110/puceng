@@ -1,0 +1,54 @@
+# @package _global_
+
+# specify here default configuration
+# order of defaults determines the order in which configs override each other
+defaults:
+  - _self_
+  - data: puceng
+  - model: puceng
+  # - model: bilstm
+  - callbacks: puceng
+  - logger: csv # wandb # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+
+  # experiment configs allow for version control of specific hyperparameters
+  # e.g. best hyperparameters for given model and datamodule
+  # - experiment: example_puceng
+
+  # config for hyperparameter optimization
+  # - hparams_search: puceng_optuna     # 根据指定的choice多次实验
+  - hparams_search: null            # 一次实验
+
+  # optional local config for machine/user specific settings
+  # it's optional since it doesn't need to exist and is excluded from version control
+  - optional local: default
+
+  # debugging config (enable through command line, e.g. `python train.py debug=default)
+  - debug: null
+
+# task name, determines output directory path
+task_name: "train"
+
+# tags to help you identify your experiments
+# you can overwrite this in experiment configs
+# overwrite from command line with `python train.py tags="[first_tag, second_tag]"`
+
+# tags: ["data-loop-IL-0.2-1.2THz-13k"] #训练的这个模型的名称 
+tags: ["data-loop-IL-0.2-0.22THz-30k"] #训练的这个模型的名称  
+
+
+# set False to skip model training
+train: True
+
+# evaluate on test set, using best model weights achieved during training
+# lightning chooses best weights based on the metric specified in checkpoint callback
+test: True
+
+# simply provide checkpoint path to resume training
+ckpt_path: null
+
+# seed for random number generators in pytorch, numpy and python.random
+seed: 666

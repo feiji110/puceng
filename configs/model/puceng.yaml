@@ -1,0 +1,42 @@
+_target_: src.models.puceng_module.PUCENGLitModule
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 0.003
+  weight_decay: 0.01
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 10
+
+net:
+  _target_: src.models.components.puceng_net.PUCENGResNet
+  # input_size: 60  # 20*3
+  # lin1_size: 128
+  # lin2_size: 256
+  # lin3_size: 512
+  # lin4_size: 1024
+  # lin5_size: 512   #80% /root/c/d/puceng/logs/new/train/runs/2024-07-07_10-17-05/checkpoints/epoch_060.ckpt
+  input_size: 60  # 20*3
+  lin1_size: 256
+  lin2_size: 512  
+  lin3_size: 1024
+  lin4_size: 1024
+  lin5_size: 768
+  # lin5_size: 1024
+  # input_size: 102  # 34*3#神经网络的输入和输出及中间层的架构，包括升维和降维
+  # lin1_size: 256
+  # lin2_size: 512
+  # lin3_size: 1024
+  # lin4_size: 2048
+  # lin5_size: 1024
+  output_size: 1049 # output size
+  dropout_rate: 0  
+
+
+# compile model for faster training with pytorch 2.0
+compile: false

@@ -1,0 +1,20 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - data: puceng # choose datamodule with `test_dataloader()` for evaluation
+  - model: puceng
+  - logger: null
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+
+task_name: "eval"
+
+tags: ["dev"]
+
+# passing checkpoint path is necessary for evaluation
+# ckpt_path: /root/c/d/puceng/logs/new/train/runs/2024-06-25_10-20-04/checkpoints/epoch_080.ckpt
+ckpt_path: /root/c/d/puceng/logs/new/train/runs/2024-06-28_15-40-09/checkpoints/epoch_004.ckpt #准备训练好的预测模型 输入：python src/eval.py(查看该模型的精度和mse)
+
