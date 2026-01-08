@@ -30,7 +30,7 @@ model:
   compile: false
 
 data:
-  batch_size: 500
+  batch_size: 64
   num_workers: 24
 
 logger:
