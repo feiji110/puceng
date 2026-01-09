@@ -44,8 +44,7 @@ class PUCENGLitModule(LightningModule):
     ) -> None: 
         super().__init__()
         torch.set_float32_matmul_precision('high') 
-        self.save_hyperparameters(logger=False)
-
+        self.save_hyperparameters(logger=False,ignore=['net']) 
         self.net = net
         
         self.criterion = torch.nn.MSELoss()   # MSELoss、L1Loss
