@@ -161,7 +161,7 @@ def main():
     parser = argparse.ArgumentParser(description="Bayesian Optimization for Ion Gel Structure")
     
     parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
-    parser.add_argument('--n_iter', type=int, default=20, help='Number of optimization iterations (for RS, total iters)')
+    parser.add_argument('--n_iter', type=int, default=19, help='Number of optimization iterations (for RS, total iters)')
     parser.add_argument('--init_points', type=int, default=5, help='Number of initial random points for BO')
     parser.add_argument('--encoder_path', type=str, default=DEFAULT_ENCODER_PATH, help='Path to one_hot_encoder')
     parser.add_argument('--checkpoint_path', type=str, default=DEFAULT_CHECKPOINT_PATH, help='Path to model checkpoint')
@@ -219,8 +219,8 @@ def main():
         print(f"BO Best Target: {bo_max_target:.4f}")
         print(f"RS Best Target: {rs_max_target:.4f}")
         
-        ratio = bo_max_target / rs_max_target if rs_max_target != 0 else float('inf')
-        print(f"Ratio (BO/RS): {ratio:.2f}")
+        ratio = rs_max_target / bo_max_target if rs_max_target != 0 else float('inf')
+        print(f"Optimization Deviation Ratio η (RS/BO): {ratio:.2f}")
         
         if bo_max_target >= rs_max_target:
              print("SUCCESS: BO matched or outperformed Random Search.")
