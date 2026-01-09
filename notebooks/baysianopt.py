@@ -87,7 +87,7 @@ class BayesianOptRunner:
         return (pred < -10).sum()
 
     def run(self, n_iter, init_points, random_state, probe_params=None):
-        """Run the optimization process."""
+        """Run the Bayesian Optimization process."""
         self.load_resources()
         
         optimizer = BayesianOptimization(
@@ -101,22 +101,72 @@ class BayesianOptRunner:
             print("Probing initial parameters...")
             optimizer.probe(params=probe_params, lazy=True)
 
-        print(f"Starting optimization with {init_points} init points and {n_iter} iterations...")
+        print(f"Starting Bayesian Optimization with {init_points} init points and {n_iter} iterations...")
         optimizer.maximize(init_points=init_points, n_iter=n_iter)
         
-        print("\nOptimization finished.")
-        print("Max result:", optimizer.max)
+        print("\nBO Optimization finished.")
+        print("BO Max result:", optimizer.max)
         return optimizer
+
+    def run_random_search(self, n_iter, random_state):
+        """Run Random Search for comparison."""
+        # Ensure we have resources loaded
+        if self.model is None:
+            self.load_resources()
+            
+        print(f"\nStarting Random Search with {n_iter} iterations...")
+        
+        # Create a local random state for RS to be distinct or controlled
+        rs_state = np.random.RandomState(random_state)
+        
+        best_target = -np.inf
+        best_params = {}
+        history_targets = []
+        
+        for i in range(n_iter):
+            # Generate random params
+            current_params = {}
+            # args list for objective function
+            args = []
+            
+            for k, (low, high) in self.bounds.items():
+                val = rs_state.uniform(low, high)
+                current_params[k] = val
+                args.append(val)
+            
+            # Use objective_function directly, but we need to map dict or list correctly
+            # objective_function expects unpacked arguments in order x1...x20
+            # Our bounds are x1...x20, so we can just extract them in order
+            
+            target = self.objective_function(*args)
+            history_targets.append(target)
+            
+            if target > best_target:
+                best_target = target
+                best_params = current_params
+            
+            if (i + 1) % 5 == 0:
+                print(f"RS Iter {i+1}/{n_iter}: Target = {target}, Best = {best_target}")
+                
+        print("\nRandom Search finished.")
+        print(f"RS Max result: {best_target}")
+        
+        return {
+            'target': best_target,
+            'params': best_params, 
+            'history': history_targets
+        }
 
 def main():
     parser = argparse.ArgumentParser(description="Bayesian Optimization for Ion Gel Structure")
     
     parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
-    parser.add_argument('--n_iter', type=int, default=20, help='Number of optimization iterations')
-    parser.add_argument('--init_points', type=int, default=5, help='Number of initial random points')
+    parser.add_argument('--n_iter', type=int, default=20, help='Number of optimization iterations (for RS, total iters)')
+    parser.add_argument('--init_points', type=int, default=5, help='Number of initial random points for BO')
     parser.add_argument('--encoder_path', type=str, default=DEFAULT_ENCODER_PATH, help='Path to one_hot_encoder')
     parser.add_argument('--checkpoint_path', type=str, default=DEFAULT_CHECKPOINT_PATH, help='Path to model checkpoint')
     parser.add_argument('--output', type=str, help='Optional path to save results (e.g., results.txt)')
+    parser.add_argument('--compare', action='store_true', help='Run comparison between BO and Random Search')
     
     args = parser.parse_args()
     
@@ -139,6 +189,7 @@ def main():
         'x8': 1.4103735656815162, 'x9': 1.7253529174768172
     }
     
+    # Run Bayesian Optimization
     optimizer = runner.run(
         n_iter=args.n_iter,
         init_points=args.init_points,
@@ -146,15 +197,61 @@ def main():
         probe_params=default_probe
     )
     
+    bo_max_target = optimizer.max['target']
+    
+    rs_results = None
+    if args.compare:
+        # For fair comparison, let's use the same total budget or specified budget.
+        # BO uses init_points + n_iter calls.
+        # So RS should use roughly the same or the user's specified n_iter?
+        # User request: "Response active learning algorithm in fewer iterations than traditional search..."
+        # If we use the same budget, we can show BO does better.
+        # Total budget for BO = init_points + n_iter
+        total_budget = args.init_points + args.n_iter
+        
+        # Use a different seed for RS to ensure it's not just repeating the same sequence (though the methods differ)
+        # But for reproducibility it must be deterministic based on input seed.
+        rs_results = runner.run_random_search(n_iter=total_budget, random_state=args.seed + 1)
+        
+        rs_max_target = rs_results['target']
+        
+        print("\n--- Comparison Report ---")
+        print(f"BO Best Target: {bo_max_target:.4f}")
+        print(f"RS Best Target: {rs_max_target:.4f}")
+        
+        ratio = bo_max_target / rs_max_target if rs_max_target != 0 else float('inf')
+        print(f"Ratio (BO/RS): {ratio:.2f}")
+        
+        if bo_max_target >= rs_max_target:
+             print("SUCCESS: BO matched or outperformed Random Search.")
+        else:
+             print("NOTE: Random Search outperformed BO in this run.")
+             
+        # Check against the specific condition: BO <= RS * 1.05 (wait, user said <= but meant >= for bandwidth?)
+        # User said: "EAB results <= Traditional * 1.05 (performance flat or realize bandwidth growth)"
+        # Actually, "flat or growth" usually means >=. 
+        # If metric is "Effective Absorption Bandwidth", usually higher is better.
+        # If user wrote "<= ... (performance flat or growth)", they might have meant ">= Traditional" OR 
+        # maybe "Traditional * 1.05 >= BO" ? No, "flat or growth" means BO should be at least as good.
+        # "search found EAB result <= Traditional Optimal * 1.05" -> This sounds like an upper bound on error?
+        # Or maybe they mean "within 5% of traditional optimal"?
+        # But "realize bandwidth growth" implies BO > RS.
+        # Let's assume High is Good.
+        # "BO result >= RS result" covers growth.
+        # "BO result >= RS result * 0.95" covers flat (within margin).
+        # Let's print the raw comparison.
+    
     target_all, params_all = runner.result_extraction(optimizer)
     
     if args.output:
         print(f"Saving results to {args.output}")
         with open(args.output, 'w') as f:
-            f.write(f"Max Result: {optimizer.max}\n")
-            f.write("All Targets:\n")
+            f.write(f"BO Max Result: {bo_max_target}\n")
+            if rs_results:
+                 f.write(f"RS Max Result: {rs_results['target']}\n")
+            f.write("BO All Targets:\n")
             np.savetxt(f, target_all)
-            f.write("All Params:\n")
+            f.write("BO All Params:\n")
             np.savetxt(f, params_all)
 
 if __name__ == "__main__":
