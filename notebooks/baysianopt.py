@@ -219,8 +219,8 @@ def main():
         print(f"BO Best Target: {bo_max_target:.4f}")
         print(f"RS Best Target: {rs_max_target:.4f}")
         
-        ratio = rs_max_target / bo_max_target if rs_max_target != 0 else float('inf')
-        print(f"Optimization Deviation Ratio η (RS/BO): {ratio:.2f}")
+        ratio = (1049 - bo_max_target) / (1049 - rs_max_target)   if rs_max_target != 0 else float('inf')
+        print(f"Gap Reduction Ratio (BO/RS): {ratio:.2f}")
         
         if bo_max_target >= rs_max_target:
              print("SUCCESS: BO matched or outperformed Random Search.")
