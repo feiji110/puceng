@@ -76,7 +76,7 @@ class PUCENGDataModule(LightningDataModule):
         x_arr = enc.transform(x_arr)
         # 保存预处理编码器
         import joblib
-        joblib.dump(enc, '/root/c/d/puceng/notebooks/data/one_hot_encoder_20.pkl')  # 在加载20层数据时，这里的joblib对应one_hot_encoder_20，同时也需要改
+        joblib.dump(enc, self.hparams.data_dir + '/one_hot_encoder_20.pkl')  # 在加载20层数据时，这里的joblib对应one_hot_encoder_20，同时也需要改
         dataset = TensorDataset(torch.from_numpy(x_arr).float(), torch.from_numpy(y_arr).float())
         if os.path.exists(self.hparams.data_dir  + 'puceng.pt'):
             os.remove(self.hparams.data_dir  + 'puceng.pt')
