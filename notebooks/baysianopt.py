@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from joblib import load
 from bayes_opt import BayesianOptimization
-import sys 
+import sys,time
 sys.path.append('/home/hengda/material/puceng/')
 # from notebooks.puceng_module import PUCENGLitModule
 from src.models.puceng_module import PUCENGLitModule
@@ -158,6 +158,12 @@ class BayesianOptRunner:
         }
 
 def main():
+        # 添加：记录程序开始时间
+    program_start_time = time.time()
+    print("=" * 60)
+    print("程序启动")
+    print("=" * 60)
+    
     parser = argparse.ArgumentParser(description="Bayesian Optimization for Ion Gel Structure")
     
     parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
@@ -253,6 +259,11 @@ def main():
             np.savetxt(f, target_all)
             f.write("BO All Params:\n")
             np.savetxt(f, params_all)
-
+    # 添加：打印总执行时间
+    total_elapsed = time.time() - program_start_time
+    print("\n" + "=" * 60)
+    print(f"程序执行完成 - 总耗时: {total_elapsed:.2f} 秒 ({total_elapsed/60:.2f} 分钟)")
+    print("=" * 6)
+    
 if __name__ == "__main__":
     main()
