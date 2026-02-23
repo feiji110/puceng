@@ -154,7 +154,7 @@ typeguard==2.13.3
 typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1708904622550/work
 tzdata==2024.1
 urllib3 @ file:///home/conda/feedstock_root/build_artifacts/urllib3_1708239446578/work
-virtualenv==20.25.1
+virtualenv==20.31.2
 wandb @ file:///home/conda/feedstock_root/build_artifacts/wandb_1707246480133/work
 wcwidth @ file:///home/conda/feedstock_root/build_artifacts/wcwidth_1704731205417/work
 widgetsnbextension==4.0.13
