@@ -125,7 +125,7 @@ pytorch-lightning==2.2.1
 pytz==2024.1
 PyYAML==6.0.1
 pyzmq @ file:///croot/pyzmq_1705605076900/work
-referencing==0.35.1
+referencing==0.36.2
 requests @ file:///home/conda/feedstock_root/build_artifacts/requests_1684774241324/work
 rich==13.7.1
 rootutils==1.0.7
