@@ -122,7 +122,7 @@ pytest==8.1.1
 python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1709299778482/work
 python-dotenv==1.0.1
 pytorch-lightning==2.2.1
-pytz==2024.1
+pytz==2025.2
 PyYAML==6.0.1
 pyzmq @ file:///croot/pyzmq_1705605076900/work
 referencing==0.35.1
